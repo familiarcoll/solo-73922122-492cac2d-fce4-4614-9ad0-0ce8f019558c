@@ -45,6 +45,16 @@
   </section>
   {% endif %}
 
+  <section class="card nav-entry">
+    <h2>已有遮盖交付表？评估区域病例负担</h2>
+    <p class="muted">
+      上传含 * 格与行/列合计的交付 CSV，选择至少两个地区与年龄段，
+      计算所选交叉区域总人数在所有相容填法下的最小值与最大值
+      （不返回任何遮盖格的单格人数）。
+    </p>
+    <a class="button" href="/inquiry">进入区域合计区间查询</a>
+  </section>
+
   <section class="card">
     <h2>上传 CSV</h2>
     <form action="/analyze" method="post" enctype="multipart/form-data">

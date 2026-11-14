@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>区域合计区间查询 - 病例交叉表安全交付工具</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="container">
+  <h1>区域合计区间查询</h1>
+  <p class="lead">
+    上传已发布的遮盖交付 CSV（数据格为非负整数或 *，含行合计、列合计与总计），
+    再选择至少两个地区与至少两个年龄段，系统将在<strong>所有与公开格及合计相容的
+    正整数填法</strong>中，求所选交叉区域总人数真正可达到的最小值与最大值；
+    不会列出任何遮盖格的单格人数。
+  </p>
+
+  <section class="card">
+    <h2>交付 CSV 格式要求</h2>
+    <ul>
+      <li>首行为年龄段标签、首列为地区标签，末列为行合计、末行为列合计，
+          右下角为总计，合计标签均为“合计”；</li>
+      <li>数据区为 <strong>2～4 行 × 2～4 列</strong>，每格为非负整数或 *；</li>
+      <li>* 格只能填正整数，且所有填法必须符合公开格与行/列合计；</li>
+      <li>行标签（地区）互不重复，列标签（年龄段）互不重复，UTF-8 编码。</li>
+    </ul>
+    <details>
+      <summary>查看示例交付 CSV</summary>
+      <pre>地区,0-17岁,18-64岁,65岁以上,合计
+甲区,*,*,0,6
+乙区,*,*,3,12
+丙区,4,6,8,18
+合计,11,14,11,36</pre>
+    </details>
+  </section>
+
+  {% if errors %}
+  <section class="card error">
+    <h2>无法进行查询</h2>
+    <ul>
+      {% for msg in errors %}
+      <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+    <p class="muted">请修正后重新上传。系统不会显示任何遮盖格的单格人数。</p>
+  </section>
+  {% endif %}
+
+  <section class="card">
+    <h2>上传交付 CSV</h2>
+    <form action="/inquiry" method="post" enctype="multipart/form-data">
+      <div class="field">
+        <label for="file">选择 CSV 文件（UTF-8 编码）：</label>
+        <input type="file" id="file" name="file" accept=".csv,text/csv,text/plain">
+      </div>
+      <div class="field">
+        <label for="csv_text">或直接粘贴 CSV 内容：</label>
+        <textarea id="csv_text" name="csv_text" rows="8"
+                  placeholder="地区,0-17岁,18-64岁,合计&#10;甲区,*,3,8&#10;乙区,2,*,7&#10;合计,6,9,15"></textarea>
+      </div>
+      <button type="submit" class="primary">下一步：选择地区与年龄段</button>
+      <a class="button" href="/">返回遮盖工具</a>
+    </form>
+  </section>
+</main>
+</body>
+</html>

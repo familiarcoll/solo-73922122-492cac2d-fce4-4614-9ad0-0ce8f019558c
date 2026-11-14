@@ -127,3 +127,52 @@ table.preview td.masked {
 }
 
 .download-form { margin-top: 14px; }
+
+/* ---- 区域查询页 ---- */
+fieldset.pick {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 16px 14px;
+  margin: 14px 0;
+}
+
+fieldset.pick legend {
+  font-weight: 600;
+  padding: 0 6px;
+}
+
+label.check {
+  display: inline-block;
+  margin: 6px 18px 6px 0;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+label.check input { margin-right: 6px; }
+
+.count-hint { margin-bottom: 0; }
+
+.range-card .range-value {
+  font-size: 1.25rem;
+  margin: 6px 0;
+}
+
+.range-card strong {
+  color: var(--accent-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+.inline-form {
+  display: inline-block;
+  margin: 4px 0;
+}
+
+.inline-form .button, .inline-form button.primary {
+  margin-top: 0;
+}
+
+.nav-entry {
+  border-left: 4px solid var(--accent);
+}
+
+.nav-entry .button { margin-top: 4px; }

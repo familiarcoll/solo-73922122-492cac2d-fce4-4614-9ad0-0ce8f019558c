@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>选择查询区域 - 病例交叉表安全交付工具</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="container">
+  <h1>选择查询区域</h1>
+
+  {% if errors %}
+  <section class="card error">
+    <h2>选择不符合要求</h2>
+    <ul>
+      {% for msg in errors %}
+      <li>{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="card">
+    <h2>交付表预览</h2>
+    <p class="muted">共 {{ tab.n_rows }} 个地区、{{ tab.n_cols }} 个年龄段，
+      其中 <strong>{{ tab.masked | length }}</strong> 个遮盖格（*）。
+      下表仅用于确认行列标签与公开数字，系统不会反推或展示遮盖格的单格人数。</p>
+    <table class="preview">
+      <thead>
+        <tr>
+          <th>{{ tab.corner }}</th>
+          {% for label in tab.col_labels %}<th>{{ label }}</th>{% endfor %}
+          <th>合计</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in range(tab.n_rows) %}
+        <tr>
+          <td>{{ tab.row_labels[i] }}</td>
+          {% for j in range(tab.n_cols) %}
+          {% set v = tab.cells[i][j] %}
+          <td class="{{ 'masked' if v == '*' else '' }}">{{ v }}</td>
+          {% endfor %}
+          <td>{{ tab.row_totals[i] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>合计</th>
+          {% for t in tab.col_totals %}<th>{{ t }}</th>{% endfor %}
+          <th>{{ tab.grand_total }}</th>
+        </tr>
+      </tfoot>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>选择查询范围</h2>
+    <p class="muted">地区与年龄段各至少选择 {{ min_selection }} 个，
+      结果为所选行与所选列交叉区域（含其中的公开格与遮盖格）的总人数可达区间。</p>
+    <form action="/inquiry/range" method="post" id="range-form">
+      <input type="hidden" name="csv_content" value="{{ csv_content }}">
+
+      <fieldset class="pick">
+        <legend>选择地区（行，至少 {{ min_selection }} 个）</legend>
+        {% for i in range(tab.n_rows) %}
+        <label class="check">
+          <input type="checkbox" name="rows" value="{{ i }}"
+                 class="row-check" {{ "checked" if i in selected_rows else "" }}>
+          {{ tab.row_labels[i] }}
+        </label>
+        {% endfor %}
+        <p class="muted count-hint" data-for="row-check">已选 <span>0</span> 个地区</p>
+      </fieldset>
+
+      <fieldset class="pick">
+        <legend>选择年龄段（列，至少 {{ min_selection }} 个）</legend>
+        {% for j in range(tab.n_cols) %}
+        <label class="check">
+          <input type="checkbox" name="cols" value="{{ j }}"
+                 class="col-check" {{ "checked" if j in selected_cols else "" }}>
+          {{ tab.col_labels[j] }}
+        </label>
+        {% endfor %}
+        <p class="muted count-hint" data-for="col-check">已选 <span>0</span> 个年龄段</p>
+      </fieldset>
+
+      <button type="submit" class="primary">计算可达区间</button>
+      <a class="button" href="/inquiry">重新上传文件</a>
+    </form>
+  </section>
+</main>
+<script>
+(function () {
+  function bind(cls) {
+    var boxes = document.getElementsByClassName(cls);
+    var hint = document.querySelector('.count-hint[data-for="' + cls + '"] span');
+    function refresh() {
+      var n = 0;
+      for (var k = 0; k < boxes.length; k++) { if (boxes[k].checked) n++; }
+      hint.textContent = n;
+    }
+    for (var k = 0; k < boxes.length; k++) {
+      boxes[k].addEventListener('change', refresh);
+    }
+    refresh();
+  }
+  bind('row-check');
+  bind('col-check');
+  document.getElementById('range-form').addEventListener('submit', function (e) {
+    var rows = document.querySelectorAll('.row-check:checked').length;
+    var cols = document.querySelectorAll('.col-check:checked').length;
+    if (rows < {{ min_selection }} || cols < {{ min_selection }}) {
+      e.preventDefault();
+      window.alert('地区与年龄段都至少需要选择 {{ min_selection }} 个，请检查后再提交。');
+    }
+  });
+})();
+</script>
+</body>
+</html>

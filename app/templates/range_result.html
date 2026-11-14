@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>区域合计区间结果 - 病例交叉表安全交付工具</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<main class="container">
+  <h1>区域合计区间结果</h1>
+
+  <section class="card success">
+    <h2>所选区域</h2>
+    <p>地区：<strong>{{ row_labels | join("、") }}</strong>（共 {{ row_labels | length }} 个）</p>
+    <p>年龄段：<strong>{{ col_labels | join("、") }}</strong>（共 {{ col_labels | length }} 个）</p>
+    <p class="muted">区间遍历了所有满足“每个 * 格为正整数、且符合公开格与行合计、
+      列合计、总计”的填法；结果不包含任何遮盖格的单格人数。</p>
+  </section>
+
+  <section class="card range-card">
+    <h2>交叉区域总人数</h2>
+    {% if certain %}
+    <p class="range-value">确定的区域合计：<strong>{{ lo }}</strong> 人</p>
+    <p class="muted">最小值与最大值相同，说明在所有相容填法中该区域合计都被唯一确定。</p>
+    {% else %}
+    <p class="range-value">
+      可达区间：<strong>{{ lo }} ～ {{ hi }}</strong> 人
+    </p>
+    <p class="muted">最小值 {{ lo }} 人与最大值 {{ hi }} 人都存在相容填法可以真正达到，
+      系统不会列出任何遮盖格的单格人数。</p>
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>继续操作</h2>
+    <form action="/inquiry/range" method="post" class="inline-form">
+      <input type="hidden" name="csv_content" value="{{ csv_content }}">
+      <button type="submit" class="primary"
+              formaction="/inquiry/reselect" formmethod="post">返回选择页（保留本次文件）</button>
+    </form>
+    <a class="button" href="/inquiry">重新上传文件</a>
+    <a class="button" href="/">返回遮盖工具首页</a>
+    <p class="muted">提示：本页不提供遮盖格单格人数，仅按区域合计区间评估病例负担。</p>
+  </section>
+</main>
+</body>
+</html>
